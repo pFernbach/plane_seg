@@ -1,0 +1,5 @@
+<launch>
+  <node name="plane_seg" pkg="plane_seg_ros" type="plane_seg_ros" output="screen">
+    <param name="/run_test_l515" value="true" />
+  </node>
+</launch>

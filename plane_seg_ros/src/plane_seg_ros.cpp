@@ -221,6 +221,31 @@ void Pass::processFromFile(int test_example){
     origin << -0.028775, -0.005776, 0.987898;
     lookDir << 0.999956, -0.005003, 0.007958;
   }
+    else if (test_example == 6){ // L515, koroibot stairs with ramp, Gerard Bauzil room, LAAS-CNRS, Toulouse 
+    inFile = home_dir + "/data/l515/upstairs.pcd";
+    origin  << 0., 0., 0.;
+    lookDir << 0., 0., 1.;
+  } else if (test_example == 7){ // L515, koroibot stairs with ramp, Gerard Bauzil room, LAAS-CNRS, Toulouse
+    inFile = home_dir + "/data/l515/upstairs_2.pcd";
+    origin  << 0., 0., 0.;
+    lookDir << 0., 0., 1.;
+  } else if (test_example == 8){ // L515, koroibot stairs with ramp, Gerard Bauzil room, LAAS-CNRS, Toulouse
+    inFile = home_dir + "/data/l515/upstairs_3.pcd";
+    origin  << 0., 0., 0.;
+    lookDir << 0., 0., 1.;
+  } else if (test_example == 9){ // L515, koroibot stairs with ramp, Gerard Bauzil room, LAAS-CNRS, Toulouse
+    inFile = home_dir + "/data/l515/midstairs.pcd";
+    origin  << 0., 0., 0.;
+    lookDir << 0., 0., 1.;
+  } else if (test_example == 10){ // L515, koroibot stairs with ramp, Gerard Bauzil room, LAAS-CNRS, Toulouse
+    inFile = home_dir + "/data/l515/lowstairs.pcd";
+    origin  << 0., 0., 0.;
+    lookDir << 0., 0., 1.;
+  } else if (test_example == 11){ // L515, koroibot stairs with ramp, Gerard Bauzil room, LAAS-CNRS, Toulouse
+    inFile = home_dir + "/data/l515/lowstairs_edge.pcd";
+    origin  << 0., 0., 0.;
+    lookDir << 0., 0., 1.;
+  }
 
   std::cout << "\nProcessing test example " << test_example << "\n";
   std::cout << inFile << "\n";
@@ -479,6 +504,9 @@ int main( int argc, char** argv ){
   bool run_test_program = false;
   nh.param("/plane_seg/run_test_program", run_test_program, false); 
   std::cout << "run_test_program: " << run_test_program << "\n";
+  bool run_test_l515(false);
+  nh.param("/plane_seg/run_test_l515", run_test_l515, false); 
+  std::cout<<"run_test_l515: "<<run_test_l515<<"\n";
 
 
   // Enable this to run the test programs
@@ -494,6 +522,19 @@ int main( int argc, char** argv ){
 
     std::cout << "Finished!\n";
     exit(-1);
+  }
+
+  // Running tests with l515 LiDAR camera
+  if(run_test_l515){
+    std::cout<<"Runing L515 tests (T. Lasguignes)"<<std::endl;
+    app->processFromFile(6);
+    app->processFromFile(7);
+    app->processFromFile(8);
+    app->processFromFile(9);
+    app->processFromFile(10);
+    app->processFromFile(11);
+    std::cout<<"Finished."<<std::endl;
+    exit(2);
   }
 
   ROS_INFO_STREAM("Waiting for ROS messages");
