@@ -89,6 +89,8 @@ class Pass{
     ros::Publisher received_cloud_pub_, hull_cloud_pub_, hull_markers_pub_, look_pose_pub_, hull_marker_array_pub_;
 
     std::string fixed_frame_ = "odom";  // Frame in which all results are published. "odom" for backwards-compatibility. Likely should be "map".
+    std::string grid_map_topic_ = "/elevation_mapping/elevation_map";
+    std::string point_cloud_topic_ = "/plane_seg/point_cloud_in";
 
     tf2_ros::Buffer tfBuffer_;
     tf2_ros::TransformListener tfListener_;
@@ -100,9 +102,15 @@ Pass::Pass(ros::NodeHandle node_):
     node_(node_),
     tfBuffer_(ros::Duration(5.0)),
     tfListener_(tfBuffer_) {
-  grid_map_sub_ = node_.subscribe("/elevation_mapping/elevation_map", 100,
+  
+  //* Get info as params
+  node_.param("/plane_seg/fixed_frame", fixed_frame_, fixed_frame_);
+  node_.param("/plane_seg/grid_map_topic", grid_map_topic_, grid_map_topic_);
+  node_.param("/plane_seg/point_cloud_topic", point_cloud_topic_, point_cloud_topic_);
+  
+  grid_map_sub_ = node_.subscribe(grid_map_topic_, 100,
                                     &Pass::elevationMapCallback, this);
-  point_cloud_sub_ = node_.subscribe("/plane_seg/point_cloud_in", 100,
+  point_cloud_sub_ = node_.subscribe(point_cloud_topic_, 100,
                                     &Pass::pointCloudCallback, this);
 
   received_cloud_pub_ = node_.advertise<sensor_msgs::PointCloud2>("/plane_seg/received_cloud", 10);
@@ -215,14 +223,15 @@ void Pass::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr &msg){
   // Look up transform from fixed frame to point cloud frame
   geometry_msgs::TransformStamped fixed_frame_to_cloud_frame_tf;
   Eigen::Isometry3d map_T_pointcloud;
-  if (tfBuffer_.canTransform(fixed_frame_, msg->header.frame_id, msg->header.stamp, ros::Duration(0.0)))
+  std::string error_tfBuffer;
+  if (tfBuffer_.canTransform(fixed_frame_, msg->header.frame_id, msg->header.stamp, ros::Duration(0.0), &error_tfBuffer))
   {
     fixed_frame_to_cloud_frame_tf = tfBuffer_.lookupTransform(fixed_frame_, msg->header.frame_id, msg->header.stamp, ros::Duration(0.0));
     map_T_pointcloud = tf2::transformToEigen(fixed_frame_to_cloud_frame_tf);
   }
   else
   {
-    ROS_WARN_STREAM("Cannot look up transform from '" << msg->header.frame_id << "' to fixed frame ('" << fixed_frame_ <<"')");
+    ROS_WARN_STREAM("Cannot look up transform from '" << msg->header.frame_id << "' to fixed frame ('" << fixed_frame_ <<"') ("<<error_tfBuffer<<")");
   }
 
   Eigen::Vector3f origin, lookDir;
