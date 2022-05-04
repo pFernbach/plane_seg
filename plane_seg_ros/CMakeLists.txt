@@ -37,3 +37,10 @@ add_executable(${PROJECT_NAME} src/${PROJECT_NAME}.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES})
 
 # TODO: Install
+# Install node
+install(TARGETS ${PROJECT_NAME}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+# Install folders
+install(DIRECTORY launch config data
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
