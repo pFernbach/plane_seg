@@ -110,7 +110,7 @@ Pass::Pass(ros::NodeHandle node_):
   
   grid_map_sub_ = node_.subscribe(grid_map_topic_, 100,
                                     &Pass::elevationMapCallback, this);
-  point_cloud_sub_ = node_.subscribe(point_cloud_topic_, 100,
+  point_cloud_sub_ = node_.subscribe(point_cloud_topic_, 1,
                                     &Pass::pointCloudCallback, this);
 
   received_cloud_pub_ = node_.advertise<sensor_msgs::PointCloud2>("/plane_seg/received_cloud", 10);
