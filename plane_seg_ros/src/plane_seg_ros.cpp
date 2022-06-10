@@ -108,7 +108,7 @@ Pass::Pass(ros::NodeHandle node_):
   node_.param("/plane_seg/grid_map_topic", grid_map_topic_, grid_map_topic_);
   node_.param("/plane_seg/point_cloud_topic", point_cloud_topic_, point_cloud_topic_);
   
-  grid_map_sub_ = node_.subscribe(grid_map_topic_, 100,
+  grid_map_sub_ = node_.subscribe(grid_map_topic_, 1,
                                     &Pass::elevationMapCallback, this);
   point_cloud_sub_ = node_.subscribe(point_cloud_topic_, 1,
                                     &Pass::pointCloudCallback, this);
@@ -179,6 +179,7 @@ Eigen::Vector3f convertRobotPoseToSensorLookDir(Eigen::Isometry3d robot_pose){
 
 void Pass::elevationMapCallback(const grid_map_msgs::GridMap& msg){
   //std::cout << "got grid map / ev map\n";
+  ROS_INFO_STREAM("Received a grid map message. (seq: "<<msg.info.header.seq<<")");
 
   // convert message to GridMap, to PointCloud to LabeledCloud
   grid_map::GridMap map;
@@ -202,13 +203,14 @@ void Pass::elevationMapCallback(const grid_map_msgs::GridMap& msg){
     origin << map_T_elevation_map.translation().cast<float>();
     lookDir = convertRobotPoseToSensorLookDir(map_T_elevation_map);
 
-    // ROS_INFO_STREAM("Received new elevation map & looked up transform -- processing.");
+    ROS_INFO_STREAM("Received new elevation map & looked up transform -- processing.");
     processCloud(map.getFrameId(), inCloud, origin, lookDir);
   }
   else
   {
     ROS_WARN_STREAM("Cannot look up transform from '" << map.getFrameId() << "' to fixed frame ('" << fixed_frame_ <<"'). Skipping elevation map.");
   }
+  ROS_INFO_STREAM("Processed. (seq: "<<msg.info.header.seq<<")");
 }
 
 
@@ -218,7 +220,8 @@ void Pass::elevationMapCallback(const grid_map_msgs::GridMap& msg){
 // rosrun pcl_ros pcd_to_pointcloud 06.pcd   _frame_id:=/odom /cloud_pcd:=/plane_seg/point_cloud_in
 void Pass::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr &msg){
   planeseg::LabeledCloud::Ptr inCloud(new planeseg::LabeledCloud());
-  pcl::fromROSMsg(*msg,*inCloud);
+  pcl::fromROSMsg(*msg, *inCloud);
+  ROS_INFO_STREAM("Received a point cloud message. (seq: "<<msg->header.seq<<")");
 
   // Look up transform from fixed frame to point cloud frame
   geometry_msgs::TransformStamped fixed_frame_to_cloud_frame_tf;
@@ -239,6 +242,7 @@ void Pass::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr &msg){
   lookDir = convertRobotPoseToSensorLookDir(map_T_pointcloud);
 
   processCloud(msg->header.frame_id, inCloud, origin, lookDir);
+  ROS_INFO_STREAM("Processed. (seq: "<<msg->header.seq<<")");
 }
 
 
