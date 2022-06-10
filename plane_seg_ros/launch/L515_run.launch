@@ -1,8 +1,13 @@
 <launch>
-  <node name="plane_seg" pkg="plane_seg_ros" type="plane_seg_ros" output="screen">
-    <param name="/run_test_l515" value="false"/>
-    <param name="fixed_frame" value="map"/>
-    <param name="grid_map_topic" value=""/>
-    <param name="point_cloud_topic" value="/camera/depth/color/points"/>
-  </node>
+    <arg name="run_tests"         default="false"/>
+    <arg name="fixed_frame"       default="odom"/>
+    <arg name="grid_map_topic"    default="/elevation_mapping/elevation_map"/>
+    <arg name="point_cloud_topic" default="/camera/depth/color/points"/>
+
+    <node name="plane_seg" pkg="plane_seg_ros" type="plane_seg_ros" output="screen">
+        <param name="run_test_l515"     value="$(arg run_tests)"/>
+        <param name="fixed_frame"       value="$(arg fixed_frame)"/>
+        <param name="grid_map_topic"    value="$(arg grid_map_topic)"/>
+        <param name="point_cloud_topic" value="$(arg point_cloud_topic)"/>
+    </node>
 </launch>
