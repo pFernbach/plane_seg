@@ -98,8 +98,8 @@ class Pass{
     planeseg::BlockFitter::Result result_;
 };
 
-Pass::Pass(ros::NodeHandle node_):
-    node_(node_),
+Pass::Pass(ros::NodeHandle node):
+    node_(node),
     tfBuffer_(ros::Duration(5.0)),
     tfListener_(tfBuffer_) {
   

@@ -361,8 +361,8 @@ go() {
     fitter.setDimensions(mBlockDimensions.head<2>());
     fitter.setAlgorithm((RectangleFitter::Algorithm)mRectangleFitAlgorithm);
     fitter.setData(plane.mPoints, plane.mPlane);
-    auto result = fitter.go();
-    results.push_back(result);
+    auto fitter_go = fitter.go();
+    results.push_back(fitter_go);
   }
 
   if (mDebug) {

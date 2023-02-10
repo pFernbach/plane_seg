@@ -192,14 +192,14 @@ int main() {
     {
 
       std::string outFileTxt = home_dir + "/drs_testing_data/terrain/test-output-heightmap.txt";
-      std::ofstream ofs(outFileTxt);
+      std::ofstream ofs2(outFileTxt);
       for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
-          ofs << heights[i*w+j] << " ";
+          ofs2 << heights[i*w+j] << " ";
         }
-        ofs << std::endl;
+        ofs2 << std::endl;
       }
-      ofs.close();
+      ofs2.close();
     }
     
     std::string outFile = home_dir + "/drs_testing_data/terrain/test-output-aligned.pcd";

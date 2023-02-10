@@ -158,10 +158,10 @@ RectangleFitter::go() {
   // compute area of convex hull
   float convexArea = 0;
   for (int i = 0; i < (int)flatCloud.size(); ++i) {
-    Eigen::Vector2f p1, p2;
-    p1 = flatCloud.points[i].getVector3fMap().head<2>();
-    p2 = flatCloud.points[(i+1)%flatCloud.size()].getVector3fMap().head<2>();
-    convexArea += std::abs(p1[0]*p2[1] - p1[1]*p2[0]);
+    Eigen::Vector2f p1_2d, p2_2d;
+    p1_2d = flatCloud.points[i].getVector3fMap().head<2>();
+    p2_2d = flatCloud.points[(i+1)%flatCloud.size()].getVector3fMap().head<2>();
+    convexArea += std::abs(p1_2d[0]*p2_2d[1] - p1_2d[1]*p2_2d[0]);
   }
   convexArea /= 2;
 

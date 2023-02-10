@@ -191,7 +191,7 @@ namespace edge_detection {
 
     edge_idx EdgeDetection::findNextEdge(){
       double min_dist = 10000.0;
-      edge_idx closest_idx;
+      edge_idx closest_idx = 0;
       for( size_t i = 0; i < edges_.size(); i++ ){
         Eigen::Vector2d base_pos = Eigen::Vector2d(base_pose_[0], base_pose_[1]);
         double distance_from_base = computeDistanceBtwEdgeAndBaseInWorldFrame(edges_.at(i).point1_wf, edges_.at(i).point2_wf, base_pos);

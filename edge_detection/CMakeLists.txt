@@ -62,6 +62,7 @@ add_library(${PROJECT_NAME}
 
 include_directories(
   include
+  SYSTEM
   ${catkin_INCLUDE_DIRS}
   )
 
