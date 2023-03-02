@@ -188,15 +188,18 @@ void Pass::elevationMapCallback(const grid_map_msgs::GridMap& msg){
   grid_map::GridMapRosConverter::toPointCloud(map, "elevation", pointCloud);
   planeseg::LabeledCloud::Ptr inCloud(new planeseg::LabeledCloud());
   pcl::fromROSMsg(pointCloud,*inCloud);
+  std::string map_frame_id(map.getFrameId());
+  if (map_frame_id.rfind("/", 0) == 0)
+    map_frame_id.erase(0, 1);
 
   // Expressed in is first argument
-  if (tfBuffer_.canTransform(fixed_frame_, map.getFrameId(), msg.info.header.stamp, ros::Duration(0.02)))
+  if (tfBuffer_.canTransform(fixed_frame_, map_frame_id, msg.info.header.stamp, ros::Duration(0.02)))
   {
     // Look up transform of elevation map frame when it was captured
     geometry_msgs::TransformStamped fixed_frame_to_elevation_map_frame_tf;
     Eigen::Isometry3d map_T_elevation_map;
 
-    fixed_frame_to_elevation_map_frame_tf = tfBuffer_.lookupTransform(fixed_frame_, map.getFrameId(), msg.info.header.stamp, ros::Duration(0.02));
+    fixed_frame_to_elevation_map_frame_tf = tfBuffer_.lookupTransform(fixed_frame_, map_frame_id, msg.info.header.stamp, ros::Duration(0.02));
     map_T_elevation_map = tf2::transformToEigen(fixed_frame_to_elevation_map_frame_tf);
   
     Eigen::Vector3f origin, lookDir;
@@ -204,11 +207,11 @@ void Pass::elevationMapCallback(const grid_map_msgs::GridMap& msg){
     lookDir = convertRobotPoseToSensorLookDir(map_T_elevation_map);
 
     ROS_INFO_STREAM("Received new elevation map & looked up transform -- processing.");
-    processCloud(map.getFrameId(), inCloud, origin, lookDir);
+    processCloud(map_frame_id, inCloud, origin, lookDir);
   }
   else
   {
-    ROS_WARN_STREAM("Cannot look up transform from '" << map.getFrameId() << "' to fixed frame ('" << fixed_frame_ <<"'). Skipping elevation map.");
+    ROS_WARN_STREAM("Cannot look up transform from '" << map_frame_id << "' to fixed frame ('" << fixed_frame_ <<"'). Skipping elevation map.");
   }
   ROS_INFO_STREAM("Processed. (seq: "<<msg.info.header.seq<<")");
 }
