@@ -2,7 +2,7 @@
     <arg name="run_tests"         default="false"/>
     <arg name="fixed_frame"       default="odom"/>
     <arg name="grid_map_topic"    default="/elevation_mapping/elevation_map"/>
-    <arg name="point_cloud_topic" default="/camera/depth/color/points"/>
+    <arg name="point_cloud_topic" default=""/>
 
     <node name="plane_seg" pkg="plane_seg_ros" type="plane_seg_ros" output="screen">
         <param name="run_test_l515"     value="$(arg run_tests)"/>

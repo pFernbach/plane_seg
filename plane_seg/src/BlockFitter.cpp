@@ -361,6 +361,11 @@ go() {
     planes.push_back(plane);
   }
 
+  std::cout<<"Plane segmentation done, number of planes: "<<planes.size()<<std::endl;
+  for (auto& plane : planes) {
+    std::cout<<"Number of points in plane: "<<plane.mPoints.size()<<std::endl;
+  }
+
   std::vector<RectangleFitter::Result> results;
   results.reserve(planes.size());
   for (auto& plane : planes) {

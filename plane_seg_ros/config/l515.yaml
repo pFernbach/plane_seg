@@ -1,0 +1,9 @@
+plane_seg:
+  max_angle_plane_segmenter: 5. # Maximal angle between two normals to be considered the same surface
+  remove_ground: false # If true, filter out all the points close to Z=O
+  segmenter_max_error: 0.05 
+  segmenter_min_points: 50 # Segmenter filter out surfaces containing less than this number of points
+  block_length: 0.057
+  block_width: 0.063
+  block_height: 0.
+  rectangle_fit_algorithm: 0  # MinimumArea, ClosestToPriorSize, MaximumHullPointOverlap
