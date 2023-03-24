@@ -42,6 +42,8 @@ public:
   void setMaxAngleOfPlaneSegmenter(const float iDegrees);
   void setAreaThresholds(const float iMin, const float iMax);
   void setRectangleFitAlgorithm(const RectangleFitAlgorithm iAlgo);
+  void setSegmenterMaxError(const float iMax);
+  void setSegmenterMinPoints(const int iMin);
   void setDebug(const bool iVal);
   void setCloud(const LabeledCloud::Ptr& iCloud);
 
@@ -62,6 +64,8 @@ protected:
   float mMaxAngleOfPlaneSegmenter;
   float mAreaThreshMin;
   float mAreaThreshMax;
+  float mSegmenterMaxError;
+  int mSegmenterMinPoints;
   RectangleFitAlgorithm mRectangleFitAlgorithm;
   LabeledCloud::Ptr mCloud;
   bool mDebug;

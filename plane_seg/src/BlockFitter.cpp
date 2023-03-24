@@ -52,6 +52,13 @@ BlockFitter() {
   setDebug(true);
 }
 
+void BlockFitter::setSegmenterMaxError(const float iMax){
+  mSegmenterMaxError = iMax;
+}
+void BlockFitter::setSegmenterMinPoints(const int iMin){
+  mSegmenterMinPoints = iMin;
+}
+
 void BlockFitter::
 setSensorPose(const Eigen::Vector3f& iOrigin,
               const Eigen::Vector3f& iLookDir) {
@@ -307,11 +314,11 @@ go() {
   }
   PlaneSegmenter segmenter;
   segmenter.setData(cloud, normals);
-  segmenter.setMaxError(0.05);
+  segmenter.setMaxError(mSegmenterMaxError);
   // setMaxAngle was 5 for LIDAR. changing to 10 really improved elevation map segmentation
   // I think its because the RGB-D map can be curved
   segmenter.setMaxAngle(mMaxAngleOfPlaneSegmenter);
-  segmenter.setMinPoints(100);
+  segmenter.setMinPoints(mSegmenterMinPoints);
   PlaneSegmenter::Result segmenterResult = segmenter.go();
   if (mDebug) {
     auto t1 = std::chrono::high_resolution_clock::now();

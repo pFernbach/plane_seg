@@ -62,6 +62,30 @@ auto rotToStr = [](const Eigen::Matrix3f& iRot) {
   return oss.str();
 };
 
+struct PassParam{
+  float max_angle_plane_segmenter_ = 5.;
+  bool remove_ground_ = false;
+  float segmenter_max_error_ = 0.05 ;
+  int segmenter_min_points_ = 50; // Segmenter filter out surfaces containing less than this number of points
+  Eigen::Vector3f block_dimension_ = Eigen::Vector3f(0.057, 0.063, 0);
+  planeseg::BlockFitter::RectangleFitAlgorithm rectangle_fit_algorithm_ =
+      planeseg::BlockFitter::RectangleFitAlgorithm::MinimumArea;  // MinimumArea, ClosestToPriorSize, MaximumHullPointOverlap
+  void configure(ros::NodeHandle node)
+  {
+    node.getParam("plane_seg/max_angle_plane_segmenter", max_angle_plane_segmenter_);
+    node.getParam("plane_seg/remove_ground", remove_ground_);
+    node.getParam("plane_seg/segmenter_max_error", segmenter_max_error_);
+    node.getParam("plane_seg/segmenter_min_points", segmenter_min_points_);
+    double block_length, block_width, block_height;
+    node.getParam("plane_seg/block_length", block_length);
+    node.getParam("plane_seg/block_width", block_width);
+    node.getParam("plane_seg/block_height", block_height);
+    block_dimension_ = Eigen::Vector3f(block_length, block_width, block_height);
+    int rectangle_fit_algorithm(0);
+    node.getParam("plane_seg/rectangle_fit_algorithm", rectangle_fit_algorithm);
+    rectangle_fit_algorithm_ = planeseg::BlockFitter::RectangleFitAlgorithm(rectangle_fit_algorithm);
+  }
+};
 
 class Pass{
   public:
@@ -92,6 +116,9 @@ class Pass{
     std::string grid_map_topic_ = "/elevation_mapping/elevation_map";
     std::string point_cloud_topic_ = "/plane_seg/point_cloud_in";
 
+    PassParam params_;
+
+
     tf2_ros::Buffer tfBuffer_;
     tf2_ros::TransformListener tfListener_;
 
@@ -108,6 +135,8 @@ Pass::Pass(ros::NodeHandle node):
   node_.param("/plane_seg/grid_map_topic", grid_map_topic_, grid_map_topic_);
   node_.param("/plane_seg/point_cloud_topic", point_cloud_topic_, point_cloud_topic_);
   
+  params_.configure(node);
+
   grid_map_sub_ = node_.subscribe(grid_map_topic_, 1,
                                     &Pass::elevationMapCallback, this);
   point_cloud_sub_ = node_.subscribe(point_cloud_topic_, 1,
@@ -340,10 +369,13 @@ void Pass::processCloud(const std::string& cloudFrame, planeseg::LabeledCloud::P
   fitter.setCloud(inCloud);
   fitter.setDebug(false); // MFALLON modification
   fitter.setRemoveGround(false); // MFALLON modification from default
-
+  fitter.setSegmenterMaxError(params_.segmenter_max_error_);
+  fitter.setSegmenterMinPoints(params_.segmenter_min_points_);
   // this was 5 for LIDAR. changing to 10 really improved elevation map segmentation
   // I think its because the RGB-D map can be curved
-  fitter.setMaxAngleOfPlaneSegmenter(10);
+  fitter.setMaxAngleOfPlaneSegmenter(params_.max_angle_plane_segmenter_);
+  fitter.setBlockDimensions(params_.block_dimension_);
+  fitter.setRectangleFitAlgorithm(params_.rectangle_fit_algorithm_);
 
   result_ = fitter.go();
 #ifdef WITH_TIMING
